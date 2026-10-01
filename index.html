@@ -110,9 +110,6 @@ button.vil[aria-pressed="true"]{
   background:var(--accent-wash); color:var(--accent); font-weight:600;
   box-shadow:0 0 0 1px var(--b9), 0 0 0 3px var(--ring);
 }
-.famkey{display:flex; flex-wrap:wrap; gap:5px 14px; margin:11px 0 0; font-size:var(--f2); color:var(--ink-3)}
-.famkey span{display:flex; align-items:center; gap:5px}
-.famkey i{width:7px;height:7px;border-radius:50%;display:block}
 
 /* ---------- workhorse ---------- */
 .cards{display:grid; grid-template-columns:1fr; gap:7px}
@@ -178,7 +175,6 @@ button.soft:hover{background:#008ff526}
 .idea .lab{font-size:var(--f3); font-weight:600; color:var(--ink); margin:0}
 .idea .soft{margin:0}
 .idea #ideaOut{margin-top:13px; padding-top:13px; border-top:1px solid var(--s4)}
-.idea .register{margin-top:10px}
 
 /* ---------- circuit ---------- */
 .circuit .lab{font-size:var(--f2); font-weight:500; color:var(--ink-2); margin:0 0 10px}
@@ -245,7 +241,6 @@ footer{margin-top:16px; font-size:var(--f2); color:var(--ink-3); display:flex; f
       <span>Village: <b id="i-village"></b></span>
       <span>Workhorse: <b id="i-chassis"></b></span>
     </div>
-    <p class="register">A worked example, not an answer. Yours should be stranger.</p>
   </div>
 </div>
 
@@ -253,12 +248,6 @@ footer{margin-top:16px; font-size:var(--f2); color:var(--ink-3); display:flex; f
   <div class="head"><span class="num">01</span><h2>Choose your village</h2></div>
   <p class="ask">iGEM sorts every team in the world into one of fifteen villages, so pick the problem you'd want to work on.</p>
   <div class="villages" id="g-village"></div>
-  <div class="famkey">
-    <span><i style="background:var(--v-env)"></i>Planet</span>
-    <span><i style="background:var(--v-health)"></i>Health</span>
-    <span><i style="background:var(--v-make)"></i>Making &amp; growing</span>
-    <span><i style="background:var(--v-frontier)"></i>Frontier</span>
-  </div>
 </div>
 
 <div class="panel" data-stage="chassis">
@@ -349,11 +338,22 @@ footer{margin-top:16px; font-size:var(--f2); color:var(--ink-3); display:flex; f
 
 <script>
 (function(){
-  /* ---- Google Form wiring. Set FORM_BASE to the form's /viewform URL and fill each
-     ENTRY id from the form's prefill link. Until then the page falls back to
-     copy-and-paste, which works for every student either way. ---- */
-  var FORM_BASE="";
-  var ENTRY={village:"",chassis:"",sense:"",logic:"",output:"",sentence:"",name:"",point:"",hard:"",klass:""};
+  /* ---- Google Form wiring. Send opens the form prefilled with everything the
+     student wrote, so they only have to tap Submit. If anything here is wrong or
+     empty, the page falls back to copy-and-paste instead of failing. ---- */
+  var FORM_BASE="https://docs.google.com/forms/d/e/1FAIpQLSfBmYHKebBull2jU06Hk9Ywz9uUbrST1iCZYfjOkCPCfBP_OA/viewform";
+  var ENTRY={
+    village:"entry.142207426",
+    chassis:"entry.135920846",
+    sense:"entry.1004090377",
+    logic:"entry.1770439097",
+    output:"entry.1877794148",
+    sentence:"entry.1041923656",
+    name:"entry.1662816786",
+    point:"entry.476848562",
+    hard:"entry.391478796",
+    klass:"entry.764649980"
+  };
 
   var VILLAGES=[
   {n:"Bioremediation",f:"env",
