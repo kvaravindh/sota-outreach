@@ -141,6 +141,34 @@ button.chip[aria-pressed="true"]{
 }
 button.chip[aria-pressed="true"] b{color:var(--decide)}
 
+/* ---------- live gate ---------- */
+.gate{margin:12px 0 0; padding:12px 13px 10px; background:var(--panel-2); border-radius:var(--r3); box-shadow:0 0 0 1px var(--s5)}
+.gate .lab{margin:0 0 6px; font-size:var(--f2); font-weight:500; color:var(--ink-2)}
+.gate svg{display:block; width:100%; height:auto; touch-action:manipulation}
+.gate .node{cursor:pointer}
+.gate .node rect{fill:var(--panel); stroke:var(--s7); stroke-width:1.5; transition:fill .18s, stroke .18s}
+.gate .node text{font:600 13px Inter,system-ui,sans-serif; fill:var(--s12)}
+.gate .node .sm{font:500 10.5px Inter,system-ui,sans-serif; fill:var(--s12)}
+.gate .node:focus{outline:none}
+.gate .node:focus-visible rect{stroke:var(--b9); stroke-width:2.5}
+.gate .node.on rect{fill:#e6f4fe; stroke:var(--sense); stroke-width:2.2}
+.gate .node.out.on rect{fill:#ffe5e5; stroke:var(--do); stroke-width:2.2}
+.gate .op rect{fill:#fff6e5; stroke:#f3ba63; stroke-width:1.8}
+.gate .op text{font:700 15px Inter,system-ui,sans-serif; fill:var(--decide)}
+.gate .op .sm{font:500 10.5px Inter,system-ui,sans-serif; fill:var(--s12)}
+.gate .wire{fill:none; stroke:var(--s7); stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; transition:stroke .18s}
+.gate .wire.live{stroke:var(--sense); stroke-dasharray:7 7; animation:flow .7s linear infinite}
+.gate .wire.outw.live{stroke:var(--do)}
+.gate .head-arrow{fill:var(--s7); transition:fill .18s}
+.gate .head-arrow.live{fill:var(--sense)}
+.gate .head-arrow.outw.live{fill:var(--do)}
+@keyframes flow{to{stroke-dashoffset:-14}}
+.gate .read{margin:6px 0 0; font-size:var(--f3); line-height:1.45; font-weight:500}
+.gate .read .st{font-weight:700}
+.gate .read .st.hi{color:var(--do)}
+.gate .reset{margin:8px 0 0}
+@media (prefers-reduced-motion:reduce){.gate .wire.live{animation:none; stroke-dasharray:none}}
+
 /* ---------- inputs ---------- */
 input[type=text],textarea{
   width:100%; font:inherit; font-size:16px; color:var(--ink); background:var(--panel);
@@ -277,6 +305,43 @@ footer{margin-top:16px; font-size:var(--f2); color:var(--ink-3); display:flex; f
   <p class="ask">What logic connects detecting to doing?</p>
   <div class="chips" id="g-logic"></div>
   <p class="register">AND and OR need two inputs; NOT, REMEMBER and COUNT work with one.</p>
+  <div class="gate" id="gate" hidden>
+    <p class="lab">Tap the inputs and watch what the cell does.</p>
+    <svg viewBox="0 0 520 210" role="img" aria-label="Live logic diagram">
+      <polyline class="wire" id="w-a" points=""></polyline>
+      <polygon class="head-arrow" id="h-a" points=""></polygon>
+      <polyline class="wire" id="w-b" points=""></polyline>
+      <polygon class="head-arrow" id="h-b" points=""></polygon>
+      <polyline class="wire outw" id="w-o" points="325,105 352,105"></polyline>
+      <polygon class="head-arrow outw" id="h-o" points="352,99 362,105 352,111"></polygon>
+
+      <g class="node" id="n-a" tabindex="0" role="button" aria-pressed="false">
+        <rect x="8" y="22" width="150" height="52" rx="5"></rect>
+        <text x="83" y="45" text-anchor="middle" id="t-a">input A</text>
+        <text x="83" y="62" text-anchor="middle" class="sm" id="t-ah">tap to hold on</text>
+      </g>
+
+      <g class="node" id="n-b" tabindex="0" role="button" aria-pressed="false">
+        <rect x="8" y="128" width="150" height="52" rx="5"></rect>
+        <text x="83" y="151" text-anchor="middle" id="t-b">input B</text>
+        <text x="83" y="168" text-anchor="middle" class="sm">tap to hold on</text>
+      </g>
+
+      <g class="op">
+        <rect x="215" y="72" width="110" height="66" rx="5"></rect>
+        <text x="270" y="101" text-anchor="middle" id="t-k">AND</text>
+        <text x="270" y="120" text-anchor="middle" class="sm" id="t-kd">both must be true</text>
+      </g>
+
+      <g class="node out" id="n-o">
+        <rect x="362" y="72" width="150" height="66" rx="5"></rect>
+        <text x="437" y="101" text-anchor="middle" id="t-o">output</text>
+        <text x="437" y="120" text-anchor="middle" class="sm" id="t-od">off</text>
+      </g>
+    </svg>
+    <p class="read" id="g-read"></p>
+    <button class="soft reset" type="button" id="g-reset" hidden>Reset it</button>
+  </div>
 </div>
 
 <div class="panel" data-stage="do" data-role="do">
@@ -411,11 +476,11 @@ footer{margin-top:16px; font-size:var(--f2); color:var(--ink-3); display:flex; f
     {t:"Fungal mycelium",d:"Grows into whatever shape you give it, and already makes packaging and leather."}
   ];
   var LOGIC=[
-    {k:"AND",d:"both must be true"},
-    {k:"OR",d:"either will do"},
-    {k:"NOT",d:"only when it's absent"},
-    {k:"REMEMBER",d:"once it happens, stay on"},
-    {k:"COUNT",d:"only after it happens enough"}
+    {k:"AND",d:"both must be true",s:"both true",n:2,m:"hold"},
+    {k:"OR",d:"either will do",s:"either one",n:2,m:"hold"},
+    {k:"NOT",d:"only when it's absent",s:"only if absent",n:1,m:"hold"},
+    {k:"REMEMBER",d:"once it happens, stay on",s:"latches on",n:1,m:"pulse"},
+    {k:"COUNT",d:"only after it happens enough",s:"after 3 times",n:1,m:"pulse"}
   ];
 
   var S={village:null,chassis:null,logic:null};
@@ -461,10 +526,85 @@ footer{margin-top:16px; font-size:var(--f2); color:var(--ink-3); display:flex; f
       Array.prototype.forEach.call($("g-logic").children,function(el,j){
         el.setAttribute("aria-pressed", S.logic===j?"true":"false");
       });
-      render();
+      gReset(); render();
     });
     $("g-logic").appendChild(b);
   });
+
+  /* ---- the live gate: tap the inputs, watch the wires carry the signal ---- */
+  var G={a:false,b:false,latch:false,count:0,pulse:false};
+  var COUNT_TO=3;
+  function gReset(){ G.a=false; G.b=false; G.latch=false; G.count=0; G.pulse=false; }
+  function gTrunc(s,n){ s=String(s||""); return s.length>n ? s.slice(0,n-1)+"…" : s; }
+  function gateOn(){
+    var k=lg(); if(!k) return false;
+    if(k==="AND") return G.a && G.b;
+    if(k==="OR") return G.a || G.b;
+    if(k==="NOT") return !G.a;
+    if(k==="REMEMBER") return G.latch;
+    return G.count>=COUNT_TO;
+  }
+  function cls(id,on,extra){ var el=$(id); el.setAttribute("class",(extra?extra+" ":"")+(on?"live":"")); }
+  function drawGate(){
+    var k=lg();
+    $("gate").hidden = !k;
+    if(!k) return;
+    var it=LOGIC[S.logic], two=it.n===2, pulse=it.m==="pulse", sl=senses();
+
+    $("t-k").textContent=k; $("t-kd").textContent=it.s;
+    $("gate").querySelector("svg").setAttribute("viewBox", two?"0 0 520 210":"0 58 520 94");
+    $("t-a").textContent=gTrunc(sl[0]||"input A",20);
+    $("t-b").textContent=gTrunc(sl[1]||"input B",20);
+    $("t-ah").textContent=pulse?"tap to pulse":"tap to hold on";
+    $("t-o").textContent=gTrunc(val("doA")||"output",20);
+
+    $("n-a").setAttribute("transform", two?"translate(0,0)":"translate(0,57)");
+    ["n-b","w-b","h-b"].forEach(function(id){
+      if(two) $(id).removeAttribute("hidden"); else $(id).setAttribute("hidden","");
+    });
+
+    $("w-a").setAttribute("points", two?"158,48 186,48 186,90 205,90":"158,105 205,105");
+    $("h-a").setAttribute("points", two?"205,84 215,90 205,96":"205,99 215,105 205,111");
+    $("w-b").setAttribute("points","158,154 186,154 186,120 205,120");
+    $("h-b").setAttribute("points","205,114 215,120 205,126");
+
+    var aOn = pulse ? G.pulse : G.a, bOn = G.b, out = gateOn();
+    $("n-a").setAttribute("class", aOn?"node on":"node");
+    $("n-b").setAttribute("class", bOn?"node on":"node");
+    $("n-o").setAttribute("class", out?"node out on":"node out");
+    $("n-a").setAttribute("aria-pressed", aOn?"true":"false");
+    $("n-b").setAttribute("aria-pressed", bOn?"true":"false");
+    cls("w-a",aOn,"wire"); cls("h-a",aOn,"head-arrow");
+    cls("w-b",bOn,"wire"); cls("h-b",bOn,"head-arrow");
+    cls("w-o",out,"wire outw"); cls("h-o",out,"head-arrow outw");
+    $("t-od").textContent = out?"on":"off";
+
+    var r;
+    if(k==="AND") r = G.a&&G.b ? "Both inputs are on, so it fires." : "It needs both at once, so nothing happens yet.";
+    else if(k==="OR") r = (G.a||G.b) ? "One input is enough, so it fires." : "Neither input is on, so nothing happens.";
+    else if(k==="NOT") r = G.a ? "The input is on, which is exactly when it stays quiet." : "The input is absent, so it fires.";
+    else if(k==="REMEMBER") r = G.latch ? "It happened once, and the cell has stayed on ever since." : "It has not happened yet, so the cell is off.";
+    else r = "Counted "+G.count+" of "+COUNT_TO+(G.count>=COUNT_TO?", so it fires.":", so it is still waiting.");
+    $("g-read").innerHTML='<span class="st'+(out?" hi":"")+'">'+(out?"ON":"OFF")+'</span> — '+r;
+    $("g-reset").hidden = !(pulse);
+  }
+  function tapA(){
+    var it=S.logic===null?null:LOGIC[S.logic]; if(!it) return;
+    if(it.m==="hold"){ G.a=!G.a; drawGate(); return; }
+    if(it.k==="REMEMBER") G.latch=true; else G.count++;
+    G.pulse=true; drawGate();
+    setTimeout(function(){ G.pulse=false; drawGate(); },620);
+  }
+  function tapB(){ G.b=!G.b; drawGate(); }
+  function wire(id,fn){
+    var el=$(id);
+    el.addEventListener("click",fn);
+    el.addEventListener("keydown",function(e){
+      if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){ e.preventDefault(); fn(); }
+    });
+  }
+  wire("n-a",tapA); wire("n-b",tapB);
+  $("g-reset").addEventListener("click",function(){ gReset(); drawGate(); });
 
   /* ---- sparks, drawn from the chosen village ---- */
   function pool(kind){
@@ -534,6 +674,7 @@ footer{margin-top:16px; font-size:var(--f2); color:var(--ink-3); display:flex; f
     h+='<span class="kw">then</span> ';
     h+= out ? '<span class="ov">'+esc(out)+'</span>' : '<span class="ph">something it does</span>';
     $("sent").innerHTML=h;
+    drawGate();
     $("c-village").textContent = S.village===null ? "none yet" : VILLAGES[S.village].n;
     $("c-chassis").textContent = S.chassis===null ? "none yet" : strip(CHASSIS[S.chassis].t);
 

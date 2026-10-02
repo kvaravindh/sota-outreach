@@ -109,4 +109,4 @@ A public Pages URL matters here — it avoids sign-in walls, works on the school
 - [ ] Rewrite the trailer script against this concept — the earlier draft was written for a different framing and should not be used
 - [ ] Deploy to Pages and test on a phone on the SOTA network
 - [ ] Confirm distribution date with Renee, working back from the 25 Oct close
-- [ ] Build the talk around whatever comes in
+- [ ] Build the talk around whatever comes in (run sheet: `SESSION_RUNSHEET.md`)
